@@ -1,18 +1,24 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { authContext } from "../../Provider/AuthProvider";
 import {
   loadCaptchaEnginge,
   LoadCanvasTemplate,
   validateCaptcha,
 } from "react-simple-captcha";
+import { Helmet } from "react-helmet-async";
+import Swal from "sweetalert2";
+import SigninWithSocial from "../SigninWithSocial/SigninWithSocial";
 
 const Login = () => {
   const { user, signInUser } = useContext(authContext);
   const [error, setError] = useState([]);
   const [success, setSuccess] = useState([]);
-  const captchaRef = useRef(null);
   const [disabled, setDisabled] = useState(true);
+
+  const location = useLocation();
+  const navigate = useNavigate();
+  const from = location.state?.from?.pathname || "/";
 
   const loginHandler = (e) => {
     e.preventDefault();
@@ -24,7 +30,15 @@ const Login = () => {
       .then((loggedUser) => {
         const user = loggedUser.user;
         console.log(user);
-        setSuccess("successfully Registered");
+        Swal.fire({
+          title: "Login Successful",
+          showClass: {
+            popup: "animate__animated animate__fadeInDown",
+          },
+          hideClass: {
+            popup: "animate__animated animate__fadeOutUp",
+          },
+        });
         setError("");
       })
       .catch((error) => {
@@ -32,14 +46,15 @@ const Login = () => {
         console.log(message);
         setError(message);
         setSuccess("");
+        navigate(from, { replace: true });
       });
   };
   useEffect(() => {
     loadCaptchaEnginge(6);
   }, []);
 
-  const validateCaptchaHandler = () => {
-    const user_captcha_value = captchaRef.current.value;
+  const validateCaptchaHandler = (e) => {
+    const user_captcha_value = e.target.value;
     console.log(user_captcha_value);
     if (validateCaptcha(user_captcha_value)) {
       setDisabled(false);
@@ -99,16 +114,10 @@ const Login = () => {
                 <input
                   type="text"
                   name="captcha"
-                  ref={captchaRef}
+                  onBlur={validateCaptchaHandler}
                   placeholder="Type Same Captcha"
                   className="input input-bordered"
                 />
-                <button
-                  onClick={validateCaptchaHandler}
-                  className="btn mt-2 btn-xs"
-                >
-                  Validate
-                </button>
               </div>
               <div className="form-control mt-6">
                 <input
@@ -126,6 +135,8 @@ const Login = () => {
                   </Link>
                 </p>
               </div>
+              <div className="divider">OR</div>
+              <SigninWithSocial></SigninWithSocial>
             </form>
           </div>
         </div>

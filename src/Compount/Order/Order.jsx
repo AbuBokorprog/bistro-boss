@@ -44,35 +44,35 @@ const Order = () => {
           <TabPanel>
             <div className="grid grid-cols-3 gap-4">
               {salad.map((i) => (
-                <TabSection items={i}></TabSection>
+                <TabSection items={i} key={i._id}></TabSection>
               ))}
             </div>
           </TabPanel>
           <TabPanel>
             <div className="grid grid-cols-3 gap-4">
               {pizza.map((i) => (
-                <TabSection items={i}></TabSection>
+                <TabSection items={i} key={i._id}></TabSection>
               ))}
             </div>
           </TabPanel>
           <TabPanel>
             <div className="grid grid-cols-3 gap-4">
               {soup.map((i) => (
-                <TabSection items={i}></TabSection>
+                <TabSection items={i} key={i._id}></TabSection>
               ))}
             </div>
           </TabPanel>
           <TabPanel>
             <div className="grid grid-cols-3 gap-4">
               {desert.map((des) => (
-                <TabSection items={des}></TabSection>
+                <TabSection items={des} key={des._id}></TabSection>
               ))}
             </div>
           </TabPanel>
           <TabPanel>
             <div className="grid grid-cols-3 gap-4">
               {drinks.map((d) => (
-                <TabSection items={d}></TabSection>
+                <TabSection items={d} key={d._id}></TabSection>
               ))}
             </div>
           </TabPanel>

@@ -1,39 +1,66 @@
 import React, { useContext, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { authContext } from "../../Provider/AuthProvider";
 import { useForm } from "react-hook-form";
+import { Helmet } from "react-helmet-async";
+import Swal from "sweetalert2";
+import SigninWithSocial from "../SigninWithSocial/SigninWithSocial";
 
 const Register = () => {
-  const { user, createUser } = useContext(authContext);
+  const { user, createUser, updateUser } = useContext(authContext);
   const [error, setError] = useState([]);
   const [success, setSuccess] = useState([]);
+  const navigate = useNavigate();
 
   const {
     register,
     handleSubmit,
-    watch,
+    reset,
     formState: { errors },
   } = useForm();
-  const onSubmit = (data) => console.log(data);
+  //const onSubmit = (data) => console.log(data);
 
-  const RegisterHandler = (e) => {
-    e.preventDefault();
-    const form = e.target;
-    const email = form.email.value;
-    const password = form.password.value;
-    const name = form.name.value;
+  const onSubmit = (data) => {
+    const email = data.email;
+    const password = data.password;
+    const name = data.name;
+    const photo = data.photo;
     createUser(email, password)
       .then((loggedUser) => {
         const user = loggedUser.user;
         console.log(user);
         setSuccess("successfully Registered");
         setError("");
+        updateUser(name, photo)
+          .then(() => {})
+          .catch((error) => {
+            //error
+          });
+        navigate("/");
       })
       .catch((error) => {
         const message = error.message;
         console.log(message);
         setError(message);
         setSuccess("");
+      });
+    const saveUser = { name: name, email: email };
+    fetch("http://localhost:5000/users", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(saveUser),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        if (data.insertedId) {
+          reset();
+          Swal.fire({
+            icon: "success",
+            title: "Registered successfully",
+            text: "Success! Register",
+          });
+        }
       });
   };
 
@@ -119,6 +146,23 @@ const Register = () => {
                   </p>
                 )}
               </div>
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text">Photo</span>
+                </label>
+                <input
+                  type="text"
+                  name="photo"
+                  placeholder="Past your photo url"
+                  {...register("photo")}
+                  className="input input-bordered"
+                />
+                {errors.photo?.type === "photo" && (
+                  <p className="text-red-500" role="alert">
+                    Photo is required
+                  </p>
+                )}
+              </div>
               <div className="form-control mt-6">
                 <input
                   className="btn btn-primary"
@@ -134,6 +178,8 @@ const Register = () => {
                   </Link>
                 </p>
               </div>
+              <div className="divider">OR</div>
+              <SigninWithSocial></SigninWithSocial>
             </form>
           </div>
         </div>
